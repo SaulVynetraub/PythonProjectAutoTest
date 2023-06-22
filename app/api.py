@@ -115,17 +115,19 @@ class PetFriends:
                              animal_type: str,
                              age: str) -> json:
         """Создание нового питомца без фотографии. Возвращает JSON с данными созданного питомца."""
-        headers = {'auth_key': auth_key['key']}
-        data = {
-            'name': name,
-            'animal_type': animal_type,
-            'age': age
-        }
+        data = MultipartEncoder(
+            fields={
+                'name': name,
+                'animal_type': animal_type,
+                'age': age
+            })
+        headers = {'auth_key': auth_key['key'], 'Content-Type': data.content_type}
         res = requests.post(self.base_url + 'api/create_pet_simple', headers=headers, data=data)
         status = res.status_code
         result = ''
         try:
             result = res.json()
-        except:
+        except json.decoder.JSONDecodeError:
             result = res.text
+        print(result)
         return status, result
